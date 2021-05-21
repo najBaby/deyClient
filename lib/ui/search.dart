@@ -7,10 +7,10 @@ import 'package:flutter/material.dart';
 import 'package:grpc/grpc.dart' as grpc;
 import 'package:fixnum/fixnum.dart';
 
+import 'service/schema/movie.pbgrpc.dart';
 import 'widgets.dart';
 import 'article.dart';
 import 'core/aspect.dart';
-import 'core/schema/movie.pbgrpc.dart';
 
 class SearchArticlesScaffold extends StatefulWidget {
   @override
@@ -67,7 +67,14 @@ class _SearchArticlesScaffoldState extends State<SearchArticlesScaffold> {
           switch (snapshot.connectionState) {
             case ConnectionState.none:
             case ConnectionState.waiting:
-              return SizedBox.shrink();
+              return Center(
+                child: SizedBox.fromSize(
+                  size: Size.fromRadius(10.0),
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.0,
+                  ),
+                ),
+              );
             default:
           }
 
@@ -93,8 +100,8 @@ class _SearchArticlesScaffoldState extends State<SearchArticlesScaffold> {
               ),
               SliverPadding(
                 padding: EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 10,
+                  horizontal: 16.0,
+                  vertical: 10.0,
                 ),
                 sliver: SliverGrid(
                   delegate: SliverChildBuilderDelegate(
@@ -124,16 +131,36 @@ class _SearchArticlesScaffoldState extends State<SearchArticlesScaffold> {
                           );
                         },
                         image: movie.image,
-                        title: movie.title.toUpperCase(),
-                        subtitle: movie.subtitle.toUpperCase(),
+                        title: Text(
+                          movie.title.toUpperCase(),
+                          softWrap: false,
+                          overflow: TextOverflow.fade,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 20.0,
+                            fontFamily: 'Antonio',
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        subtitle: Text(
+                          movie.subtitle.toUpperCase(),
+                          softWrap: false,
+                          overflow: TextOverflow.fade,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            fontFamily: 'Antonio',
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                       );
                     },
                     childCount: movies.length,
                   ),
                   gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                     maxCrossAxisExtent: ratio.longestArea * 400,
-                    crossAxisSpacing: 10.0,
-                    childAspectRatio: 0.55,
+                    crossAxisSpacing: 16.0,
+                    childAspectRatio: 0.5,
                     mainAxisSpacing: 5.0,
                   ),
                 ),

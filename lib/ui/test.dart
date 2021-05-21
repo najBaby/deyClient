@@ -1,124 +1,20 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
 
+import 'service/schema/movie.pb.dart';
 import 'widgets.dart';
 
-class TestScaffold extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Player(
-        videoUrl: "https://nan.ci",
-      ),
-    );
-  }
-}
-
-class Player extends StatefulWidget {
-  final String videoUrl;
-  final String referer;
-
-  Player({this.videoUrl, this.referer});
-  @override
-  _PlayerState createState() => _PlayerState();
-}
-
-class _PlayerState extends State<Player> {
-  Future<void> initialize;
-  VideoPlayerController controller;
-
-  @override
-  void initState() {
-    super.initState();
-    controller = VideoPlayerController.network(
-      widget.videoUrl,
-      httpHeaders: {
-        "Referer": widget.referer,
-      },
-    );
-    initialize = controller.initialize();
-  }
-
-  @override
-  void dispose() {
-    SystemChrome.setPreferredOrientations(DeviceOrientation.values);
-    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
-    controller.dispose();
-    super.dispose();
-  }
-
-  Future<void> get modeVideo async {
-    await SystemChrome.setPreferredOrientations(
-      [
-        DeviceOrientation.landscapeLeft,
-        DeviceOrientation.landscapeRight,
-      ],
-    );
-    await SystemChrome.setEnabledSystemUIOverlays([]);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<void>(
-      future: modeVideo,
-      builder: (context, snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.waiting:
-            return SizedBox.shrink();
-          default:
-        }
-        return FutureBuilder<Object>(
-          future: initialize,
-          builder: (context, snapshot) {
-            switch (snapshot.connectionState) {
-              case ConnectionState.waiting:
-                return Center(child: CircularProgressIndicator());
-              default:
-            }
-            var media = MediaQuery.of(context);
-            return Tile(
-              background: AspectRatio(
-                child: VideoPlayer(controller),
-                aspectRatio: media.size.aspectRatio,
-              ),
-              foreground: ControllerPlayer(controller),
-            );
-          },
-        );
-      },
-    );
-  }
-}
-
-class Tile extends StatelessWidget {
-  final Widget foreground;
-  final Widget background;
-  Tile({
-    this.foreground,
-    this.background,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Positioned.fill(
-          child: background,
-        ),
-        Positioned.fill(
-          child: foreground,
-        ),
-      ],
-    );
-  }
-}
 
 class ControllerHeader extends StatelessWidget {
-  ControllerHeader();
+  final String title;
+  final String subtitle;
+
+  ControllerHeader({this.title, this.subtitle});
 
   @override
   Widget build(BuildContext context) {
@@ -129,6 +25,8 @@ class ControllerHeader extends StatelessWidget {
         },
         child: Icon(CupertinoIcons.arrow_left),
       ),
+      title: Text(title),
+      subtitle: Text(subtitle),
     );
   }
 }
@@ -189,116 +87,194 @@ class ControllerFooter extends StatelessWidget {
   }
 }
 
-class ControllerPlayer extends StatefulWidget {
-  final VideoPlayerController controller;
-
-  ControllerPlayer(this.controller);
+class Player extends StatefulWidget {
+  final Movie movie;
+  Player({this.movie});
 
   @override
-  _ControllerPlayerState createState() => _ControllerPlayerState();
+  _PlayerState createState() => _PlayerState();
 }
 
-class _ControllerPlayerState extends State<ControllerPlayer> {
+class _PlayerState extends State<Player> {
   Duration duration;
+  Future<void> initialize;
+  Future<void> preference;
+  VideoPlayerController controller;
+
   final timeout = Duration(seconds: 5);
 
-  VideoPlayerController get controller => widget.controller;
+  @override
+  void initState() {
+    super.initState();
+    log(widget.movie.video);
+    controller = VideoPlayerController.network(
+      widget.movie.video,
+      httpHeaders: {
+        "Referer": widget.movie.hoster,
+      },
+    );
+    preference = setPreference;
+    initialize = controller.initialize();
+  }
+
+  @override
+  void dispose() {
+    SystemChrome.setPreferredOrientations(DeviceOrientation.values);
+    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+    controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> get setPreference async {
+    await SystemChrome.setPreferredOrientations(
+      [
+        DeviceOrientation.landscapeLeft,
+        DeviceOrientation.landscapeRight,
+      ],
+    );
+    await SystemChrome.setEnabledSystemUIOverlays([]);
+  }
+
+  Widget get controllerWidget => Tile(
+        foreground: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Material(
+              color: Colors.transparent,
+              child: IconButton(
+                iconSize: 40.0,
+                icon: Icon(CupertinoIcons.gobackward_10),
+                onPressed: () async {
+                  if (controller.value.isInitialized) {
+                    await controller.seekTo(
+                      controller.value.position + Duration(seconds: -10),
+                    );
+                    setState(() {
+                      duration = controller.value.isPlaying ? timeout : null;
+                    });
+                  }
+                },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(30.0),
+              child: Visibility(
+                visible: controller.value.isPlaying,
+                replacement: TextButton(
+                  onPressed: () {
+                    if (controller.value.isInitialized) {
+                      setState(() {
+                        controller.play();
+                        duration = timeout;
+                      });
+                    } else {
+                      setState(() {
+                        initialize = controller.initialize();
+                      });
+                    }
+                  },
+                  child: Icon(
+                    CupertinoIcons.play_circle,
+                    size: 70.0,
+                  ),
+                ),
+                child: TextButton(
+                  onPressed: () {
+                    if (controller.value.isInitialized) {
+                      setState(() {
+                        controller.pause();
+                        duration = null;
+                      });
+                    } else {
+                      initialize = controller.initialize();
+                    }
+                  },
+                  child: Icon(
+                    CupertinoIcons.pause_circle,
+                    size: 70.0,
+                  ),
+                ),
+              ),
+            ),
+            Material(
+              color: Colors.transparent,
+              child: IconButton(
+                iconSize: 40.0,
+                icon: Icon(CupertinoIcons.goforward_10),
+                onPressed: () async {
+                  if (controller.value.isInitialized) {
+                    await controller.seekTo(
+                      controller.value.position + Duration(seconds: 10),
+                    );
+                    setState(() {
+                      duration = controller.value.isPlaying ? timeout : null;
+                    });
+                  }
+                },
+              ),
+            ),
+          ],
+        ),
+        background: GestureDetector(
+          onTap: () {
+            setState(() {
+              duration = Duration.zero;
+            });
+          },
+        ),
+      );
 
   @override
   Widget build(BuildContext context) {
-    return VisibilityTimer(
-      duration: duration,
-      child: GridTile(
-        header: ControllerHeader(),
-        footer: ControllerFooter(controller),
-        child: Tile(
-          foreground: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Material(
-                color: Colors.transparent,
-                child: IconButton(
-                  iconSize: 40.0,
-                  icon: Icon(CupertinoIcons.gobackward_10),
-                  onPressed: () async {
-                    if (controller.value.isInitialized) {
-                      await controller.seekTo(
-                        controller.value.position + Duration(seconds: -10),
-                      );
-                      setState(() {
-                        duration = controller.value.isPlaying ? timeout : null;
-                      });
-                    }
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(30.0),
-                child: Visibility(
-                  visible: controller.value.isPlaying,
-                  replacement: TextButton(
-                    onPressed: () {
-                      if (controller.value.isInitialized)
-                        setState(() {
-                          controller.play();
-                          duration = timeout;
-                        });
-                    },
-                    child: Icon(
-                      CupertinoIcons.play_circle,
-                      size: 0.0,
-                    ),
-                  ),
-                  child: TextButton(
-                    onPressed: () {
-                      if (controller.value.isInitialized)
-                        setState(() {
-                          controller.pause();
-                          duration = null;
-                        });
-                    },
-                    child: Icon(
-                      CupertinoIcons.pause_circle,
-                      size: 70.0,
-                    ),
-                  ),
-                ),
-              ),
-              Material(
-                color: Colors.transparent,
-                child: IconButton(
-                  iconSize: 40.0,
-                  icon: Icon(CupertinoIcons.goforward_10),
-                  onPressed: () async {
-                    if (controller.value.isInitialized) {
-                      await controller.seekTo(
-                        controller.value.position + Duration(seconds: 10),
-                      );
-                      setState(() {
-                        duration = controller.value.isPlaying ? timeout : null;
-                      });
-                    }
-                  },
-                ),
-              ),
-            ],
+    var media = MediaQuery.of(context);
+
+    return FutureBuilder<void>(
+      future: preference,
+      builder: (context, snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.waiting:
+            return SizedBox.shrink();
+          default:
+        }
+        return Tile(
+          background: AspectRatio(
+            child: VideoPlayer(controller),
+            aspectRatio: media.size.aspectRatio,
           ),
-          background: GestureDetector(
-            onTap: () {
-              setState(() {
-                duration = Duration.zero;
-              });
-            },
+          foreground: VisibilityTimer(
+            duration: duration,
+            child: GridTile(
+              header: ControllerHeader(
+                title: widget.movie.title,
+                subtitle: widget.movie.subtitle,
+              ),
+              footer: ControllerFooter(controller),
+              child: FutureBuilder<void>(
+                future: initialize,
+                builder: (context, snapshot) {
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.waiting:
+                      return Center(
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.0,
+                        ),
+                      );
+                    default:
+                  }
+                  return controllerWidget;
+                },
+              ),
+            ),
+            replacement: GestureDetector(
+              onTap: () {
+                setState(() {
+                  duration = controller.value.isPlaying ? timeout : null;
+                });
+              },
+            ),
           ),
-        ),
-      ),
-      replacement: GestureDetector(
-        onTap: () {
-          setState(() {
-            duration = controller.value.isPlaying ? timeout : null;
-          });
-        },
-      ),
+        );
+      },
     );
   }
 }

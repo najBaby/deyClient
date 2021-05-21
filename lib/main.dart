@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'ui/home.dart';
+import 'ui/service/service.dart';
 
 // 0xFFF7BB0E jaune
 // 0xFFF00000 rouge
@@ -26,10 +27,12 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: HomeScaffoldd(),
-      theme: theme,
+    return Service(
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: HomeScaffoldd(),
+        theme: theme,
+      ),
     );
   }
 }

@@ -19,8 +19,10 @@ const Movie$json = const {
     const {'1': 'source', '3': 5, '4': 1, '5': 9, '10': 'source'},
     const {'1': 'subtitle', '3': 6, '4': 1, '5': 9, '10': 'subtitle'},
     const {'1': 'synopsis', '3': 7, '4': 1, '5': 9, '10': 'synopsis'},
-    const {'1': 'category', '3': 8, '4': 1, '5': 14, '6': '.google.api.Movie.Category', '10': 'category'},
-    const {'1': 'genres', '3': 9, '4': 3, '5': 9, '10': 'genres'},
+    const {'1': 'language', '3': 8, '4': 1, '5': 9, '10': 'language'},
+    const {'1': 'production', '3': 9, '4': 1, '5': 9, '10': 'production'},
+    const {'1': 'category', '3': 10, '4': 1, '5': 14, '6': '.google.api.Movie.Category', '10': 'category'},
+    const {'1': 'genres', '3': 11, '4': 3, '5': 9, '10': 'genres'},
   ],
   '4': const [Movie_Category$json],
 };
@@ -35,7 +37,7 @@ const Movie_Category$json = const {
 };
 
 /// Descriptor for `Movie`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List movieDescriptor = $convert.base64Decode('CgVNb3ZpZRIUCgV0aXRsZRgBIAEoCVIFdGl0bGUSFAoFaW1hZ2UYAiABKAlSBWltYWdlEhQKBXZpZGVvGAMgASgJUgV2aWRlbxIWCgZob3N0ZXIYBCABKAlSBmhvc3RlchIWCgZzb3VyY2UYBSABKAlSBnNvdXJjZRIaCghzdWJ0aXRsZRgGIAEoCVIIc3VidGl0bGUSGgoIc3lub3BzaXMYByABKAlSCHN5bm9wc2lzEjYKCGNhdGVnb3J5GAggASgOMhouZ29vZ2xlLmFwaS5Nb3ZpZS5DYXRlZ29yeVIIY2F0ZWdvcnkSFgoGZ2VucmVzGAkgAygJUgZnZW5yZXMiHwoIQ2F0ZWdvcnkSCAoERklMTRAAEgkKBVNFUklFEAE=');
+final $typed_data.Uint8List movieDescriptor = $convert.base64Decode('CgVNb3ZpZRIUCgV0aXRsZRgBIAEoCVIFdGl0bGUSFAoFaW1hZ2UYAiABKAlSBWltYWdlEhQKBXZpZGVvGAMgASgJUgV2aWRlbxIWCgZob3N0ZXIYBCABKAlSBmhvc3RlchIWCgZzb3VyY2UYBSABKAlSBnNvdXJjZRIaCghzdWJ0aXRsZRgGIAEoCVIIc3VidGl0bGUSGgoIc3lub3BzaXMYByABKAlSCHN5bm9wc2lzEhoKCGxhbmd1YWdlGAggASgJUghsYW5ndWFnZRIeCgpwcm9kdWN0aW9uGAkgASgJUgpwcm9kdWN0aW9uEjYKCGNhdGVnb3J5GAogASgOMhouZ29vZ2xlLmFwaS5Nb3ZpZS5DYXRlZ29yeVIIY2F0ZWdvcnkSFgoGZ2VucmVzGAsgAygJUgZnZW5yZXMiHwoIQ2F0ZWdvcnkSCAoERklMTRAAEgkKBVNFUklFEAE=');
 @$core.Deprecated('Use listMoviesRequestDescriptor instead')
 const ListMoviesRequest$json = const {
   '1': 'ListMoviesRequest',

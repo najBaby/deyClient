@@ -1,12 +1,14 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-import 'core/aspect.dart';
 import 'article.dart';
-import 'search.dart';
+import 'search_test.dart';
 import 'settings.dart';
-import 'test.dart';
+import 'core/aspect.dart';
+import 'core/device.dart';
 
 class HomeScaffoldd extends StatefulWidget {
   @override
@@ -30,7 +32,7 @@ class _HomeScaffolddState extends State<HomeScaffoldd> {
     children = [
       ListArticlesScaffold(),
       SearchArticlesScaffold(),
-      TestScaffold(),
+      SettingsScaffold(),
       SettingsScaffold(),
     ];
   }
@@ -52,6 +54,11 @@ class ListArticlesScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
     var ratio = DeviceAspectRatio.of(context);
+
+    var device = Device.of(context);
+    log(device.toString());
+    log(device.size.toString());
+    log(device.insets.toString());
     return Scaffold(
       body: NestedScrollView(
         physics: BouncingScrollPhysics(

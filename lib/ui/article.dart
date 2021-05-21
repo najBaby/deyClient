@@ -5,10 +5,9 @@ import 'package:flutter/material.dart';
 
 import 'package:grpc/grpc.dart' as grpc;
 
-import 'core/aspect.dart';
-import 'core/schema/movie.pb.dart';
-import 'core/schema/movie.pbgrpc.dart';
 import 'test.dart';
+import 'core/aspect.dart';
+import 'service/schema/movie.pbgrpc.dart';
 
 class MovieScaffold extends StatelessWidget {
   final Object tag;
@@ -108,13 +107,7 @@ class _SliverAppBar extends StatelessWidget {
       ),
       actions: [
         IconButton(
-          icon: Icon(CupertinoIcons.heart),
-          padding: EdgeInsets.zero,
-          iconSize: ratio.icon2,
-          onPressed: () {},
-        ),
-        IconButton(
-          icon: Icon(CupertinoIcons.share),
+          icon: Icon(CupertinoIcons.share_up),
           padding: EdgeInsets.zero,
           iconSize: ratio.icon2,
           onPressed: () {},
@@ -195,7 +188,7 @@ class _Data extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 5.0),
+                    padding: EdgeInsets.symmetric(horizontal: 8.0),
                     child: Chip(
                       backgroundColor: Colors.white,
                       shape: ContinuousRectangleBorder(
@@ -205,11 +198,11 @@ class _Data extends StatelessWidget {
                         color: Colors.black,
                         fontWeight: FontWeight.w600,
                       ),
-                      label: Text("ACTION"),
+                      label: Text(movie.production),
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 5.0),
+                    padding: EdgeInsets.symmetric(horizontal: 8.0),
                     child: Chip(
                       backgroundColor: Colors.white,
                       shape: ContinuousRectangleBorder(
@@ -219,11 +212,11 @@ class _Data extends StatelessWidget {
                         color: Colors.black,
                         fontWeight: FontWeight.w600,
                       ),
-                      label: Text("16+"),
+                      label: Text(movie.language),
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 5.0),
+                    padding: EdgeInsets.symmetric(horizontal: 8.0),
                     child: Chip(
                       backgroundColor: Color(0xFFE1032E),
                       shape: ContinuousRectangleBorder(
@@ -246,7 +239,11 @@ class _Data extends StatelessWidget {
               ),
             ),
             Center(
-              child: Text(movie.genres.join(" • ")),
+              child: Text(
+                movie.genres.join(" • "),
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16.0),
+              ),
             ),
             Padding(
               padding: EdgeInsets.symmetric(vertical: 16.0),
@@ -282,10 +279,7 @@ class _Data extends StatelessWidget {
                           context,
                           animation,
                           secondaryAnimation,
-                          Player(
-                            referer: movie.hoster,
-                            videoUrl: movie.video,
-                          ),
+                          Player(movie: movie),
                         );
                       },
                     ),
@@ -296,6 +290,12 @@ class _Data extends StatelessWidget {
               ),
             ),
             ListTile(
+              dense: true,
+              contentPadding: EdgeInsets.only(
+                top: 5.0,
+                left: 16.0,
+                right: 16.0,
+              ),
               title: Text(
                 movie.subtitle.toUpperCase(),
                 style: TextStyle(
@@ -308,8 +308,8 @@ class _Data extends StatelessWidget {
               indicatorSize: TabBarIndicatorSize.label,
               isScrollable: true,
               tabs: [
-                Tab(text: 'VIDEO'),
                 Tab(text: 'SYNOPSIS'),
+                Tab(text: 'VIDEO'),
               ],
             ),
             Expanded(
@@ -318,10 +318,10 @@ class _Data extends StatelessWidget {
                 child: TabBarView(
                   children: [
                     Container(
-                      child: Text("Video"),
+                      child: Text(movie.synopsis),
                     ),
                     Container(
-                      child: Text(movie.synopsis),
+                      child: Text("Video"),
                     ),
                   ],
                 ),
@@ -346,33 +346,24 @@ class _Loader extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 20.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 70.0,
-                  height: 30.0,
-                  color: Colors.grey[800],
-                  margin: EdgeInsets.symmetric(horizontal: 8.0),
+              children: List.generate(
+                3,
+                (index) => Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8.0),
+                  child: SizedBox(
+                    child: _Loading(),
+                    height: 30.0,
+                    width: 70.0,
+                  ),
                 ),
-                Container(
-                  width: 70.0,
-                  height: 30.0,
-                  color: Colors.grey[800],
-                  margin: EdgeInsets.symmetric(horizontal: 8.0),
-                ),
-                Container(
-                  width: 70.0,
-                  height: 30.0,
-                  color: Colors.grey[800],
-                  margin: EdgeInsets.symmetric(horizontal: 8.0),
-                ),
-              ],
+              ),
             ),
           ),
           Center(
-            child: Container(
-              width: 240.0,
-              height: 30.0,
-              color: Colors.grey[800],
+            child: SizedBox(
+              width: 200.0,
+              height: 20.0,
+              child: _Loading(),
             ),
           ),
           Container(
@@ -395,20 +386,20 @@ class _Loader extends StatelessWidget {
             ),
           ),
           Center(
-            child: Container(
+            child: SizedBox(
               width: 200.0,
               height: 30.0,
-              color: Colors.grey[800],
+              child: _Loading(),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: EdgeInsets.all(20.0),
             child: Align(
               alignment: Alignment.centerLeft,
-              child: Container(
+              child: SizedBox(
                 width: 100.0,
-                height: 30.0,
-                color: Colors.grey[800],
+                height: 20.0,
+                child: _Loading(),
               ),
             ),
           ),
@@ -416,29 +407,32 @@ class _Loader extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Container(
-                  width: 70.0,
-                  height: 30.0,
-                  color: Colors.grey[800],
-                  margin: EdgeInsets.symmetric(horizontal: 8.0),
+              children: List.generate(
+                3,
+                (index) => Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8.0),
+                  child: SizedBox(
+                    child: _Loading(),
+                    height: 20.0,
+                    width: 70.0,
+                  ),
                 ),
-                Container(
-                  width: 70.0,
-                  height: 30.0,
-                  color: Colors.grey[800],
-                  margin: EdgeInsets.symmetric(horizontal: 8.0),
-                ),
-                Container(
-                  width: 70.0,
-                  height: 30.0,
-                  color: Colors.grey[800],
-                  margin: EdgeInsets.symmetric(horizontal: 8.0),
-                ),
-              ],
+              ),
             ),
           )
         ],
+      ),
+    );
+  }
+}
+
+class _Loading extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey[800],
+        borderRadius: BorderRadius.circular(3.0),
       ),
     );
   }

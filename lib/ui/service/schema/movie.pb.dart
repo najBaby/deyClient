@@ -23,8 +23,10 @@ class Movie extends $pb.GeneratedMessage {
     ..aOS(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'source')
     ..aOS(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'subtitle')
     ..aOS(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'synopsis')
-    ..e<Movie_Category>(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'category', $pb.PbFieldType.OE, defaultOrMaker: Movie_Category.FILM, valueOf: Movie_Category.valueOf, enumValues: Movie_Category.values)
-    ..pPS(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'genres')
+    ..aOS(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'language')
+    ..aOS(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'production')
+    ..e<Movie_Category>(10, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'category', $pb.PbFieldType.OE, defaultOrMaker: Movie_Category.FILM, valueOf: Movie_Category.valueOf, enumValues: Movie_Category.values)
+    ..pPS(11, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'genres')
     ..hasRequiredFields = false
   ;
 
@@ -37,6 +39,8 @@ class Movie extends $pb.GeneratedMessage {
     $core.String? source,
     $core.String? subtitle,
     $core.String? synopsis,
+    $core.String? language,
+    $core.String? production,
     Movie_Category? category,
     $core.Iterable<$core.String>? genres,
   }) {
@@ -61,6 +65,12 @@ class Movie extends $pb.GeneratedMessage {
     }
     if (synopsis != null) {
       _result.synopsis = synopsis;
+    }
+    if (language != null) {
+      _result.language = language;
+    }
+    if (production != null) {
+      _result.production = production;
     }
     if (category != null) {
       _result.category = category;
@@ -155,16 +165,34 @@ class Movie extends $pb.GeneratedMessage {
   void clearSynopsis() => clearField(7);
 
   @$pb.TagNumber(8)
-  Movie_Category get category => $_getN(7);
+  $core.String get language => $_getSZ(7);
   @$pb.TagNumber(8)
-  set category(Movie_Category v) { setField(8, v); }
+  set language($core.String v) { $_setString(7, v); }
   @$pb.TagNumber(8)
-  $core.bool hasCategory() => $_has(7);
+  $core.bool hasLanguage() => $_has(7);
   @$pb.TagNumber(8)
-  void clearCategory() => clearField(8);
+  void clearLanguage() => clearField(8);
 
   @$pb.TagNumber(9)
-  $core.List<$core.String> get genres => $_getList(8);
+  $core.String get production => $_getSZ(8);
+  @$pb.TagNumber(9)
+  set production($core.String v) { $_setString(8, v); }
+  @$pb.TagNumber(9)
+  $core.bool hasProduction() => $_has(8);
+  @$pb.TagNumber(9)
+  void clearProduction() => clearField(9);
+
+  @$pb.TagNumber(10)
+  Movie_Category get category => $_getN(9);
+  @$pb.TagNumber(10)
+  set category(Movie_Category v) { setField(10, v); }
+  @$pb.TagNumber(10)
+  $core.bool hasCategory() => $_has(9);
+  @$pb.TagNumber(10)
+  void clearCategory() => clearField(10);
+
+  @$pb.TagNumber(11)
+  $core.List<$core.String> get genres => $_getList(10);
 }
 
 class ListMoviesRequest extends $pb.GeneratedMessage {
